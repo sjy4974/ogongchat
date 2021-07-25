@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    <title>chat</title>
+</head>
+<script type="text/javascript">
+
+
+</script>
+<body>
+    <body class="chat">
+
+    <div class="chat__sidebar">
+      <h3>유저목록</h3>
+      <div id="users"></div>
+    </div>
+
+    <div class="chat__main">
+      <ol id="messages" class="chat__messages"></ol>
+
+      <div class="chat__footer">
+        <form id="message-form">
+          <input type="hidden" id="studyNo" value="<%=studyNo%>">
+          <input type="hidden" id="email" value="<%=email%>">
+          <input id="messageInput" name="message" type="text" placeholder="Message" autofocus autocomplete="off"/>
+          <button id="submit-btn">전송</button>
+		  <label for="upload-btn">파일 전송</label>
+		  <input type="file" id="upload-btn" /></label>
+        </form>
+		
+      </div>
+    </div>
+
+  </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="/siofu/client.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io-stream/0.9.1/socket.io-stream.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+
+<script type="text/javascript">
+	
+    
+	
+
+	let socket = io.connect("http://localhost:82");
+	//let socket = io.connect("https://ogong-chat.herokuapp.com/");
+
+	// var uploader = new SocketIOFileUpload(socket);
+	// uploader.listenOnInput(document.getElementById("upload-btn"));
+
+	///////////////// 이미지 업로드////////////////////
+	var file = document.getElementById('upload-btn');
+	var router;
+	let studyNo= $("#studyNo").val();
+	let email = $("#email").val();
+
+	
+	
+	//파일 업로드 함수//
+	function fileupload(firstFile){
+
+		//var slice = firstFile.slice(0,4);
+		reader = new FileReader();
+
+		//reader.readAsArrayBuffer(slice);
+		
+		var type = (firstFile.name).split('.');
+		console.log("확장자: "+type[1]);
+		
+		reader.onloadend = function(){
+			var blob = new Blob([reader.result],{
+				type: firstFile.type
+			});
+			console.log(firstFile.type);
+
+			socket.emit('buffering', {
+				id: socket.id,
+			 	studyNo: studyNo,
+			 	email: email,
+			 	name: firstFile.name,
+			 	data: blob,
+			 	type: firstFile.type
+			});
+
+			// socket.emit('upload-image', {
+			// 	id: socket.id,
+			// 	studyNo: studyNo,
+			// 	email: email,
+			// 	name: firstFile.name,
+			// 	data: blob,
+			// 	type: firstFile.type
+			// });
+		};
+		reader.readAsArrayBuffer(firstFile);
+	}
+	////////////////////////////
+
+
+	//drag and drop 이벤트//
+	$(document).on("dragover drop", function(e) {
+    	e.preventDefault();  
+	}).on("drop", function(e) {
+		e.preventDefault();  
+    	var firstFile = e.originalEvent.dataTransfer.files[0];
+		fileupload(firstFile);
+	});
+	
+	// 파일 전송버튼으로 파일 업로드///
+	$('#upload-btn').on('change', ()=>{
+		if (!file.files.length) {
+			return;
+		}
+
+		var firstFile = file.files[0];
+		fileupload(firstFile);
+
+	});
+	
+	function scrollToBottom() {
+		let messages = document.querySelector('#messages').lastElementChild;
+		messages.scrollIntoView();
+	}
+	
+	socket.on('connect', function() {
+		let data = {studyNo :studyNo,
+					email :email};
+		socket.emit('join', data, function(err) {
+			if(err){
+				alert(err);
+			    window.location.href = '/';
+			}else {
+			    console.log('No Error');
+			}
+		})
+	});
+
+	
+	
+	socket.on('disconnect', function() {
+		console.log('disconnected from server.');
+		
+		
+	});
+
+	socket.on('updateUsersList', function (users) {
+		
+		$('#users ol').remove();
+		let ol = document.createElement('ol');
+		
+		users.forEach(function (user) {
+			let li = document.createElement('li');
+		    li.innerHTML = user;
+		    ol.appendChild(li);
+		});
+
+		let usersList = $('#users');
+		usersList.innerHTML = "";
+		usersList.append(ol);
+		})
+		
+
+		socket.on('newMessage', function(message) {
+
+			if(message.type == 'image/jpeg'){
+				message.text = '<img src="'+message.name+'" height="150px" />';
+			} else if (message.type == 'video/mp4') {
+				message.text = '<video id="draggable"  controls> <source src="'+message.name+'" type="video/mp4"></video>'
+			}
+			console.log(message);
+			const formattedTime = moment(message.createdAt).format('LT');
+			if (socket.id === message.id) {
+				const html = 
+				'<li class="message"><div class="mymessage__title"><span id="span1">'+
+				' me </span><span id="span2">'
+				+formattedTime+
+				'</span></div><div class="mymessage__body"><p>'
+				+message.text+
+				'</p></div></li>';
+
+				const div = document.createElement('div');
+				div.innerHTML = html;
+
+				$('#messages').append(div);
+				scrollToBottom();
+			} else {
+				const html = 
+				'<li class="message"><div class="message__title"><h4>'
+				+message.from+
+				'</h4><span>'
+				+formattedTime+
+				'</span></div><div class="message__body"><p>'
+				+message.text+
+				'</p></div></li>';
+
+				const div = document.createElement('div');
+				div.innerHTML = html;
+
+				$('#messages').append(div);
+				scrollToBottom();
+			}
+		
+	});
+	$('#submit-btn').on('click', function(e) {
+		e.preventDefault();
+		socket.emit("createMessage", {
+		text: $('#messageInput').val()
+		}, function() {
+			$('#messageInput').val('').focus();
+			
+		});
+	});
+
+
+			//let buffer = reader.result;
+			
+			// let slice = firstFile.slice(0,4);
+			// let view = new DataView(buffer);
+			// let magic = view.getUint32(0, false);
+			
+			
+			// switch(magic){
+			// 	case 0xffd8ffe0: firstFile.verified_type = "image/jpeg"; break;
+			// 	case 0x89504E47: firstFile.verified_type = "image/png"; break;
+			// 	case 0x47474638: firstFile.verified_type = "image/gif"; break;
+			// 	case 0x25504446: firstFile.verified_type = "application/pdf"; break;
+			// 	case 0x504b0304: firstFile.verified_type = "application/zip"; break;
+			// 	case 0x66747970: firstFile.verified_type = "video/mp4"; break;
+			// }
+</script>   
+</body>
+</html>
+
