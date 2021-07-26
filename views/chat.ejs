@@ -187,7 +187,7 @@
 			if(message.type == 'image/jpeg'){
 				message.text = '<img src="files/'+message.name+'" height="150px" />';
 			} else if (message.type == 'video/mp4') {
-			 	message.text = '<video id="draggable"  controls> <source src="/files/'+message.name+'" type="video/mp4"  width="300" ></video>'
+			 	message.text = '<video id="draggable"  controls> <source src="files/'+message.name+'" type="video/mp4"  width="300" ></video>'
 			}
 			console.log(message);
 			const formattedTime = moment(message.createdAt).format('LT');
