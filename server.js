@@ -64,16 +64,28 @@ io.on('connection', (socket) => {
 
 
     ss(socket).on('upload', (stream,data) =>{
+      
       var fn = path.basename(data.name);
+      console.log(fn);
       stream.pipe(fs.createWriteStream("public/files/"+fn));
 
+
+      // io.to(data.studyNo).emit('newMessage',{
+      //   id: data.id,
+      //     from: data.email,
+      //     name: data.name,
+      //     type: data.type   
+      // });
+    });
+
+    socket.on("done", (data) => {
       io.to(data.studyNo).emit('newMessage',{
-        id: data.id,
+          id: data.id,
           from: data.email,
           name: data.name,
           type: data.type   
       });
-    });
+    })
 
 /*
     socket.on('buffering',(message) =>{
