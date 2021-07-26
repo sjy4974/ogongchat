@@ -40,7 +40,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 <script src="/siofu/client.js"></script>
 <script src="/js/bundle.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io-stream/0.9.1/socket.io-stream.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io-stream/0.9.1/socket.io-stream.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 
 
@@ -66,32 +66,54 @@
 	//파일 업로드 함수//
 	function fileupload(firstFile){
 
-		//var slice = firstFile.slice(0,4);
-		reader = new FileReader();
 
-		//reader.readAsArrayBuffer(slice);
-		
+		//reader = new FileReader();
+
+
+		var AllSize = firstFile.size;
+        var UploadedSize = 0;
+        var stream = ss.createStream();
 		var type = (firstFile.name).split('.');
 		console.log("확장자: "+type[1]);
 		
+		ss(socket).emit('upload', stream, {
+			id: socket.id,
+			studyNo: studyNo,
+			email: email,
+			name: firstFile.name,
+			type: firstFile.type
+		});
+
+		var blobstream = ss.createBlobReadStream(firstFile);
+        blobstream.on('data', function(chunk){
+            UploadedSize += chunk.length;
+            console.log('updated >>'+UploadedSize+'/'+AllSize);
+        });
+        blobstream.pipe(stream);
+
+		stream.on('end', function(){
+        	console.log("업로드 끝"); 
+    	});
 
 
-		reader.onloadend = function(){
-			var blob = new Blob([reader.result],{
-				type: firstFile.type
-			});
-			console.log(firstFile.type);
+
+
+		// reader.onloadend = function(){
+		// 	var blob = new Blob([reader.result],{
+		// 		type: firstFile.type
+		// 	});
+		// 	console.log(firstFile.type);
 			
-			socket.emit('buffering', {
-				id: socket.id,
-			 	studyNo: studyNo,
-			 	email: email,
-			 	name: firstFile.name,
-			 	data: blob,
-			 	type: firstFile.type
-			});
-		};
-		reader.readAsArrayBuffer(firstFile);
+		// 	socket.emit('buffering', {
+		// 		id: socket.id,
+		// 	 	studyNo: studyNo,
+		// 	 	email: email,
+		// 	 	name: firstFile.name,
+		// 	 	data: blob,
+		// 	 	type: firstFile.type
+		// 	});
+		// };
+		// reader.readAsArrayBuffer(firstFile);
 	}
 	////////////////////////////
 
@@ -162,11 +184,11 @@
 
 		socket.on('newMessage', function(message) {
 
-			//if(message.type == 'image/jpeg'){
-				message.text = '<img src="'+message.name+'" height="150px" />';
-			// } else if (message.type == 'video/mp4') {
-			// 	message.text = '<video id="draggable"  controls> <source src="'+message.name+'" type="video/mp4"></video>'
-			// }
+			if(message.type == 'image/jpeg'){
+				message.text = '<img src="files/'+message.name+'" height="150px" />';
+			} else if (message.type == 'video/mp4') {
+			 	message.text = '<video id="draggable"  controls> <source src="/files/'+message.name+'" type="video/mp4"  width="300" ></video>'
+			}
 			console.log(message);
 			const formattedTime = moment(message.createdAt).format('LT');
 			if (socket.id === message.id) {

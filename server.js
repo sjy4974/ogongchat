@@ -6,7 +6,6 @@ var http = require('http');
 var static = require('serve-static');
 var fs = require('fs');
 var mime = require("mime/lite");
-var router = express.Router();
 var app = express().use(siofu.router);
 
 app.set('view engine','ejs');
@@ -64,6 +63,19 @@ io.on('connection', (socket) => {
     });
 
 
+    ss(socket).on('upload', (stream,data) =>{
+      var fn = path.basename(data.name);
+      stream.pipe(fs.createWriteStream("public/files/"+fn));
+
+      io.to(data.studyNo).emit('newMessage',{
+        id: data.id,
+          from: data.email,
+          name: data.name,
+          type: data.type   
+      });
+    });
+
+/*
     socket.on('buffering',(message) =>{
         
       var writer = fs.createWriteStream(path.resolve('public/files', message.name), {
@@ -86,7 +98,7 @@ io.on('connection', (socket) => {
 
     });
 
-
+*/
 
 
 
