@@ -1,9 +1,9 @@
 //const moment = require('moment');
 
-let generateMessage = (id,from, text) => {
+let generateMessage = (email, nickname, text) => {
     return {
-      id,
-      from,
+      email,
+      nickname,
       text
     };
   };

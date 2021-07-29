@@ -3,28 +3,29 @@ class Users {
       this.users = [];
     }
   
-    addUser(id, name, room) {
-      let user = {id, name, room};
+    addUser(email, name, profile, room) {
+      let user = {email, name, profile, room};
       this.users.push(user);
       return user;
     }
   
     getUserList (room) {
       let users = this.users.filter((user) => user.room === room);
-      let namesArray = users.map((user) => user.name);
-  
-      return namesArray;
+      // console.log("여기 users");
+      // console.log(users);
+      // let namesArray = users.map((user) => user.name);
+      return users;
     }
   
-    getUser(id) {
-      return this.users.filter((user) => user.id === id)[0];
+    getUser(email) {
+      return this.users.filter((user) => user.email === email)[0];
     }
   
-    removeUser(id) {
-      let user = this.getUser(id);
+    removeUser(email) {
+      let user = this.getUser(email);
   
       if(user){
-        this.users = this.users.filter((user) => user.id !== id);
+        this.users = this.users.filter((user) => user.email !== email);
       }
   
       return user;

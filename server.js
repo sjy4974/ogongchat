@@ -1,12 +1,15 @@
-var siofu = require("socketio-file-upload");
-var ss = require("socket.io-stream");
-var express = require('express');
-var path = require("path");
-var http = require('http');
-var static = require('serve-static');
-var fs = require('fs');
-var mime = require("mime/lite");
-var app = express().use(siofu.router);
+let siofu = require("socketio-file-upload");
+let ss = require("socket.io-stream");
+let express = require('express');
+let path = require("path");
+let http = require('http');
+let static = require('serve-static');
+let fs = require('fs');
+let mime = require("mime/lite");
+let app = express();
+
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json());
 
 app.set('view engine','ejs');
 app.use(express.static('public'));
@@ -17,8 +20,6 @@ var PORT = process.env.PORT||82;
  var httpServer = http.createServer(app).listen(PORT, function() {
    console.log('listening on *:82');
 })
-
-
 const io = require('socket.io')(httpServer, { cors: { origin: "*" } });
 
 const {Users} = require('./utils/users');
@@ -28,7 +29,6 @@ let users = new Users();
 //mongoose//
 const mongoose = require('mongoose');
 const Msg = require('./modules/messages');
-const { writer } = require("repl");
 const mongoDB = 'mongodb+srv://sjy4974:qwe123@cluster0.w7ej2.mongodb.net/message-database?retryWrites=true&w=majority'
 ////////////
  mongoose.connect(mongoDB, {useNewUrlParser: true,
@@ -37,29 +37,38 @@ const mongoDB = 'mongodb+srv://sjy4974:qwe123@cluster0.w7ej2.mongodb.net/message
      console.log('connected');
 }).catch(err => console.log(err));
 
+//전달 데이터 생성//
+
+
+
 app.get('/', (req,res) => {
     var query = req.query;
     console.log(query);
     res.render('chat', query);
+});
 
+app.get('/1', (req,res) => {
+  res.render('index');
 });
 
 
 io.on('connection', (socket) => {
     console.log(" user connect");
-  
+
     socket.on('join', (data, callback) => {
-        
-        socket.join(data.studyNo);
-        users.removeUser(socket.id);
-        users.addUser(socket.id, data.email, data.studyNo);
+      
+      // 전달할 데이터 생성하기.
+      //??
+      socket.join(data.studyNo);
+      users.removeUser(data.email);
+      users.addUser(data.email, data.nickname, data.profile, data.studyNo);
 
-        io.to(data.studyNo).emit('updateUsersList', users.getUserList(data.studyNo));
+      io.to(data.studyNo).emit('updateUsersList', users.getUserList(data.studyNo));
 
-        console.log("user : "+users.getUserList(data.studyNo));
-        socket.broadcast.to(data.studyNo).emit('newMessage', generateMessage('SERVER','Admin', data.email+" 님이 접속 하셨 습니다."));
+      console.log("user : "+users.getUserList(data.studyNo));
+      socket.broadcast.to(data.studyNo).emit('newMessage', generateMessage('SERVER','Admin', data.nickname+" 님이 접속 하셨 습니다."));
     
-        callback();
+      callback();
     });
 
 
@@ -68,7 +77,6 @@ io.on('connection', (socket) => {
       var fn = path.basename(data.name);
       console.log(fn);
       stream.pipe(fs.createWriteStream("public/files/"+fn));
-
 
       // io.to(data.studyNo).emit('newMessage',{
       //   id: data.id,
@@ -80,9 +88,9 @@ io.on('connection', (socket) => {
 
     socket.on("done", (data) => {
       io.to(data.studyNo).emit('newMessage',{
-          id: data.id,
-          from: data.email,
+          email: data.email,
           name: data.name,
+          filename: data.filename,
           type: data.type   
       });
     })
@@ -142,13 +150,15 @@ io.on('connection', (socket) => {
 
 
 
-    socket.on('createMessage', (message, callback) => {
+    socket.on('createMessage', (data, callback) => {
+      console.log("createmessage data값");
+      console.log(data);
       
-      let user = users.getUser(socket.id);
-      const msg = new Msg({studyNo:user.room, email:user.name, message:message.text});
+      let user = users.getUser(data.email);
+      const msg = new Msg({studyNo:user.room, email:data.email, message:data.text});
 
       msg.save().then(()=>{
-      io.to(user.room).emit('newMessage', generateMessage(socket.id, user.name, message.text));
+      io.to(user.room).emit('newMessage', generateMessage(user.email, user.name, data.text));
       });
       callback('This is the server:');
     });
@@ -165,10 +175,6 @@ io.on('connection', (socket) => {
       }
     });
 
-    //스트리밍 시작
-
-  
-    //스트리밍 끝
 
     //파일업로드 //
 

@@ -8,6 +8,17 @@
     <link rel="stylesheet" href="./css/style.css">
     <title>chat</title>
 </head>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Serif+KR:wght@600&family=Sunflower:wght@300&display=swap');
+
+h3, button, label, h4, span, p{
+font-family: 'Do Hyeon', sans-serif;
+
+}
+ul, li{
+   list-style:none;
+}
+</style>
 <script type="text/javascript">
 
 
@@ -38,7 +49,7 @@
 
   </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-<script src="/siofu/client.js"></script>
+<!-- <script src="/siofu/client.js"></script> -->
 <script src="/js/bundle.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io-stream/0.9.1/socket.io-stream.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
@@ -49,17 +60,35 @@
     
 	
 
-	//let socket = io.connect("http://localhost:82");
-	let socket = io.connect("https://ogong-chat.herokuapp.com/");
+	let socket = io.connect("http://localhost:82");
+	var file = document.getElementById('upload-btn');
+	let studyNo= $("#studyNo").val();
+	let email = $("#email").val();
+	var nickname = "";
+	var profile = "ogg.png";
+	//let socket = io.connect("https://ogong-chat.herokuapp.com/");
 
 	// var uploader = new SocketIOFileUpload(socket);
 	// uploader.listenOnInput(document.getElementById("upload-btn"));
 
 	///////////////// 이미지 업로드////////////////////
 
-	var file = document.getElementById('upload-btn');
-	let studyNo= $("#studyNo").val();
-	let email = $("#email").val();
+	$(function(){
+	
+	console.log(email);
+		
+	fetch("http://127.0.0.1:5050/studyroom/json/getUser/"+email)
+		.then(res => res.json())
+		.then(json => {
+			console.log(json);
+			nickname = json.nickname;
+			if(json.profile){
+				profile = json.userImage;
+			}
+		});
+	});
+
+	
 
 	
 	
@@ -96,35 +125,16 @@
 		stream.on('end', function(){
 			
 			socket.emit('done', {
-				id: socket.id,
 				studyNo: studyNo,
 				email: email,
-				name: firstFile.name,
+				name: nickname,
+				filename: firstFile.name,
 				type: firstFile.type
 			});
         	console.log("업로드 끝"); 
     	});
 		blobstream.pipe(stream);
 
-
-
-
-		// reader.onloadend = function(){
-		// 	var blob = new Blob([reader.result],{
-		// 		type: firstFile.type
-		// 	});
-		// 	console.log(firstFile.type);
-			
-		// 	socket.emit('buffering', {
-		// 		id: socket.id,
-		// 	 	studyNo: studyNo,
-		// 	 	email: email,
-		// 	 	name: firstFile.name,
-		// 	 	data: blob,
-		// 	 	type: firstFile.type
-		// 	});
-		// };
-		// reader.readAsArrayBuffer(firstFile);
 	}
 	////////////////////////////
 
@@ -136,8 +146,6 @@
 		e.preventDefault();  
     	var firstFile = e.originalEvent.dataTransfer.files[0];
 		fileupload(firstFile);
-
-		return false;
 	});
 
 	
@@ -150,7 +158,6 @@
 		var firstFile = file.files[0];
 		fileupload(firstFile);
 
-		return false;
 	});
 	
 	function scrollToBottom() {
@@ -160,7 +167,10 @@
 	
 	socket.on('connect', function() {
 		let data = {studyNo :studyNo,
-					email :email};
+					email :email,
+					profile: profile,
+					nickname: nickname};
+		console.log(data);
 		socket.emit('join', data, function(err) {
 			if(err){
 				alert(err);
@@ -186,7 +196,15 @@
 		
 		users.forEach(function (user) {
 			let li = document.createElement('li');
-		    li.innerHTML = user;
+			let img = document.createElement('img');
+			console.log(user.profile);
+			img.src = 'files/'+user.profile;
+			img.width = 40;
+			img.height = 20;
+		    //li.innerHTML = img;
+			li.appendChild(img);
+			li.append("  "+user.name);
+			
 		    ol.appendChild(li);
 		});
 
@@ -196,22 +214,24 @@
 		})
 		
 
-		socket.on('newMessage', function(message) {
-
-			if(message.type == 'image/jpeg'){
-				message.text = '<img src="files/'+message.name+'" height="150px" />';
-			} else if (message.type == 'video/mp4') {
-			 	message.text = '<video id="draggable"  width="250" controls> <source src="files/'+message.name+'" type="video/mp4"  ></video>'
+		socket.on('newMessage', function(data) {
+			data.type +=""
+			console.log(data.type);
+			console.log((data.type).substr(0,5));
+			if((data.type).substr(0,5) == 'image'){
+				data.text = '<img src="files/'+data.filename+'" height="150px" />';
+			} else if ((data.type).substr(0,5) == 'video') {
+			 	data.text = '<video id="draggable"  width="250" controls> <source src="files/'+message.name+'" type="video/mp4"  ></video>'
 			}
-			console.log(message);
-			const formattedTime = moment(message.createdAt).format('LT');
-			if (socket.id === message.id) {
+			console.log(data);
+			const formattedTime = moment(data.createdAt).format('LT');
+			if (email === data.email) {
 				const html = 
 				'<li class="message"><div class="mymessage__title"><span id="span1">'+
 				' me </span><span id="span2">'
 				+formattedTime+
 				'</span></div><div class="mymessage__body"><p>'
-				+message.text+
+				+data.text+
 				'</p></div></li>';
 
 				const div = document.createElement('div');
@@ -222,11 +242,11 @@
 			} else {
 				const html = 
 				'<li class="message"><div class="message__title"><h4>'
-				+message.from+
+				+data.nickname+
 				'</h4><span>'
 				+formattedTime+
 				'</span></div><div class="message__body"><p>'
-				+message.text+
+				+data.text+
 				'</p></div></li>';
 
 				const div = document.createElement('div');
@@ -240,6 +260,8 @@
 	$('#submit-btn').on('click', function(e) {
 		e.preventDefault();
 		socket.emit("createMessage", {
+		email: email,
+		nickname: nickname,
 		text: $('#messageInput').val()
 		}, function() {
 			$('#messageInput').val('').focus();
