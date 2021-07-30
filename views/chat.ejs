@@ -92,8 +92,8 @@ $(function (){
 })
 
 
-	//var socket = io.connect("http://localhost:82");	
-	let socket = io.connect("https://ogong-chat.herokuapp.com/");
+	var socket = io.connect("http://localhost:82");	
+	//let socket = io.connect("https://ogong-chat.herokuapp.com/");
 	var file = document.getElementById('upload-btn');
 	let studyNo= $("#studyNo").val();
 	let email = $("#email").val();
@@ -119,7 +119,6 @@ $(function (){
 					profile = json.userImage;
 				}
 			}).then( ()=> {
-				console.log("무조건 찍히니?");
 
 				let data = {studyNo :studyNo,
 					email :email,
@@ -258,6 +257,10 @@ $(function (){
 				data.text = '<img src="files/'+data.filename+'" height="150px" />';
 			} else if ((data.type).substr(0,5) == 'video') {
 			 	data.text = '<video id="draggable"  width="250" controls> <source src="files/'+data.filename+'" type="video/mp4"  ></video>'
+			} else if ((data.type).substr(0,4) == 'text') {
+				data.text = '<a href="files/'+data.filename+'" download>'+data.filename+'</a>';
+			} else if ((data.type).substr(0,5) == 'appli') {
+				data.text = '<a href="files/'+data.filename+'" download>'+data.filename+'</a>';
 			}
 			console.log(data);
 			const formattedTime = moment(data.createdAt).format('LT');
