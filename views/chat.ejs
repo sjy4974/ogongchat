@@ -92,8 +92,8 @@ $(function (){
 })
 
 
-	var socket = io.connect("http://localhost:82");	
-	//let socket = io.connect("https://ogong-chat.herokuapp.com/");
+	//var socket = io.connect("http://localhost:82");	
+	let socket = io.connect("https://ogong-chat.herokuapp.com/");
 	var file = document.getElementById('upload-btn');
 	let studyNo= $("#studyNo").val();
 	let email = $("#email").val();
