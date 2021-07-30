@@ -46,48 +46,22 @@ ul, li{
     color: white;
     font-weight: 600;
 }
+
 </style>
 <script type="text/javascript">
 
 
 </script>
     <body class="chat">	
+	
     <div class="chat__sidebar">
       <h3>유저목록</h3>
 	  
       <div id="users"></div>
     </div>
-	</div>
-
-
     <div class="chat__main">
       <ul id="messages" class="chat__messages"></ul>
 
-<!-- ddddd -->
-	<!-- <div class="chat__write-container">
-		<input type="hidden" id="studyNo" value="<%=studyNo%>">
-        <input type="hidden" id="email" value="<%=email%>">
-		
-		<input class="chat__write chat__write-input" type="text" placeholder="write message (클릭시 움직임)">
-		
-		
-		<div class="chat__icon-left chat__icon">
-		<span class="chat__write-icon">
-			<label for="upload-btn">
-				<i class="far fa-plus-square">
-					<input type="file" id="upload-btn" style="display: none;" />
-				</i>
-			</label>
-		</span>
-		</div>
-		<div class="chat__icon-right chat__icon">
-		<span class="chat__write-icon">
-			<i class="far fa-comment-dots"></i>
-		</span>
-		</div>
-	</div> -->
-
-<!-- dddd -->
 
       <div class="chat__footer">
         <form id="message-form">
@@ -113,7 +87,11 @@ ul, li{
 <script type="text/javascript">
 	
     
+$(function (){
 	
+})
+
+
 	//var socket = io.connect("http://localhost:82");	
 	let socket = io.connect("https://ogong-chat.herokuapp.com/");
 	var file = document.getElementById('upload-btn');

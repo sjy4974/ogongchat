@@ -22,7 +22,7 @@ button,button:hover{
     font-family:HelveticaNeue-Light,"Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
     font-weight:300;
 }
-li,ul{
+li,ul,.chat__sidebar{
     list-style-position:inside;
 }
 h3{
@@ -34,7 +34,7 @@ button{
     background:black;
     cursor:pointer;
     transition:background .3s ease;
-    border-radius: .25em;
+    border-radius: 0.90em;
 }
 button:hover{
     background:#263238;
@@ -52,7 +52,7 @@ button:disabled{
     background-color: black; 
     cursor: pointer; 
     border-bottom-color: #e2e2e2; 
-    border-radius: .25em;
+    border-radius: 0.90em;
     border:none;
     color:#fff;
 }
@@ -108,10 +108,11 @@ button:disabled{
 }
 .chat__sidebar{
     overflow-y: scroll hidden;
-    width: 260px;
+    width: 100px;
     height: 100vh;
-    background-color: #FFDC3C;
-    border-right-style: groove;
+    background-color: white;
+    margin-top: 5px;
+
 }
 .chat__footer{
     background:#FFDC3C;
@@ -166,6 +167,7 @@ ul {
     display: flex;
     align-items: flex-start;
     margin-bottom: 20px;
+    background-color: powderblue;
 }
 .chat__footer{
     display:flex;
