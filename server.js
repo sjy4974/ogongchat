@@ -61,11 +61,10 @@ io.on('connection', (socket) => {
       //??
       socket.join(data.studyNo);
       users.removeUser(data.email);
-      users.addUser(data.email, data.nickname, data.profile, data.studyNo);
+      users.addUser(socket.id, data.email, data.nickname, data.profile, data.studyNo);
 
       io.to(data.studyNo).emit('updateUsersList', users.getUserList(data.studyNo));
 
-      console.log("user : "+users.getUserList(data.studyNo));
       socket.broadcast.to(data.studyNo).emit('newMessage', generateMessage('SERVER','Admin', data.nickname+" 님이 접속 하셨 습니다."));
     
       callback();
@@ -88,6 +87,7 @@ io.on('connection', (socket) => {
 
     socket.on("done", (data) => {
       io.to(data.studyNo).emit('newMessage',{
+          socketId : socket.id,
           email: data.email,
           name: data.name,
           filename: data.filename,
@@ -95,66 +95,12 @@ io.on('connection', (socket) => {
       });
     })
 
-/*
-    socket.on('buffering',(message) =>{
-        
-      var writer = fs.createWriteStream(path.resolve('public/files', message.name), {
-        encoding: 'base64'
-      });
-
-      writer.write(message.data);
-      writer.end();
-
-      writer.on('finish', ()=>{
-        
-        io.to(message.studyNo).emit('newMessage', {
-          id: message.id,
-          from: message.email,
-          name: 'files/'+message.name,
-          type: message.type   
-        });
-      });
-
-
-    });
-
-*/
-
-
-
-/*
-    //여기 이미지전송받는 부분
-    socket.on('upload-image', (message) => {
-      console.log("blob :"+message.blob);
-
-      
-      //fileMime = mime.getType(message.name);
-
-      var writer = fs.createWriteStream(path.resolve('public/images', message.name), {
-        encoding: 'base64'
-      });
-
-      writer.write(message.data);
-      writer.end();
-
-      writer.on('finish', ()=>{
-        
-        io.to(message.studyNo).emit('newMessage', {
-          id: message.id,
-          from: message.email,
-          name: 'images/'+message.name     
-        });
-      });
-    });
-  */
-
-
 
     socket.on('createMessage', (data, callback) => {
       console.log("createmessage data값");
       console.log(data);
       
-      let user = users.getUser(data.email);
+      let user = users.getUser(socket.id);
       const msg = new Msg({studyNo:user.room, email:data.email, message:data.text});
 
       msg.save().then(()=>{
@@ -165,6 +111,7 @@ io.on('connection', (socket) => {
 
   
     socket.on('disconnect', () => {
+
       let user = users.removeUser(socket.id);
   
       if(user){

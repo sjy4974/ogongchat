@@ -5,34 +5,89 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+	<link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.11.2/css/all.css"
+    />
     <link rel="stylesheet" href="./css/style.css">
     <title>chat</title>
 </head>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Serif+KR:wght@600&family=Sunflower:wght@300&display=swap');
 
-h3, button, label, h4, span, p{
+h3, button, label, h4, span, p, li{
 font-family: 'Do Hyeon', sans-serif;
 
 }
 ul, li{
    list-style:none;
 }
+#profile{
+    position: relative;
+    right: -4.2%;
+}
+#pname {
+	top: -10px;
+    color: black;
+    position: relative;
+    right: -10%;
+
+}
+.message__bubble {
+    border-top-right-radius: 0;
+    background-image: linear-gradient(to left, #00c6ff, #0072ff);
+}
+
+.message__bubble {
+    background-color: white;
+    box-shadow: rgb(50 50 93 / 25%) 0px 13px 27px -5px, rgb(0 0 0 / 30%) 0px 8px 16px -8px, rgb(0 0 0 / 2%) 0px -6px 16px -6px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    color: white;
+    font-weight: 600;
+}
 </style>
 <script type="text/javascript">
 
 
 </script>
-<body>
-    <body class="chat">
-
+    <body class="chat">	
     <div class="chat__sidebar">
       <h3>유저목록</h3>
+	  
       <div id="users"></div>
     </div>
+	</div>
+
 
     <div class="chat__main">
-      <ol id="messages" class="chat__messages"></ol>
+      <ul id="messages" class="chat__messages"></ul>
+
+<!-- ddddd -->
+	<!-- <div class="chat__write-container">
+		<input type="hidden" id="studyNo" value="<%=studyNo%>">
+        <input type="hidden" id="email" value="<%=email%>">
+		
+		<input class="chat__write chat__write-input" type="text" placeholder="write message (클릭시 움직임)">
+		
+		
+		<div class="chat__icon-left chat__icon">
+		<span class="chat__write-icon">
+			<label for="upload-btn">
+				<i class="far fa-plus-square">
+					<input type="file" id="upload-btn" style="display: none;" />
+				</i>
+			</label>
+		</span>
+		</div>
+		<div class="chat__icon-right chat__icon">
+		<span class="chat__write-icon">
+			<i class="far fa-comment-dots"></i>
+		</span>
+		</div>
+	</div> -->
+
+<!-- dddd -->
 
       <div class="chat__footer">
         <form id="message-form">
@@ -46,8 +101,8 @@ ul, li{
 		
       </div>
     </div>
+</div>
 
-  </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 <!-- <script src="/siofu/client.js"></script> -->
 <script src="/js/bundle.js"></script>
@@ -59,40 +114,53 @@ ul, li{
 	
     
 	
-
-	//let socket = io.connect("http://localhost:82");
+	//var socket = io.connect("http://localhost:82");	
 	let socket = io.connect("https://ogong-chat.herokuapp.com/");
 	var file = document.getElementById('upload-btn');
 	let studyNo= $("#studyNo").val();
 	let email = $("#email").val();
 	var nickname = "";
 	var profile = "default.jpg";
-	//let socket = io.connect("https://ogong-chat.herokuapp.com/");
-
 	// var uploader = new SocketIOFileUpload(socket);
 	// uploader.listenOnInput(document.getElementById("upload-btn"));
 
 	///////////////// 이미지 업로드////////////////////
 
 	$(function(){
+
+		console.log(email);
 	
-	console.log(email);
-		
-	fetch("http://127.0.0.1:5050/studyroom/json/getUser/"+email)
-		.then(res => res.json())
-		.then(json => {
-			console.log(json);
-			nickname = json.nickname;
-			if(json.profile){
-				profile = json.userImage;
-			}
+		socket.on('connect', function() {
+
+			fetch("http://127.0.0.1:5050/studyroom/json/getUser/"+email)
+			.then(res => res.json())
+			.then(json => {
+				console.log(json);
+				nickname = json.nickname;
+				if(json.profile){
+					profile = json.userImage;
+				}
+			}).then( ()=> {
+				console.log("무조건 찍히니?");
+
+				let data = {studyNo :studyNo,
+					email :email,
+					profile: profile,
+					nickname: nickname};
+				console.log(data);
+				socket.emit('join', data, function(err) {
+					if(err){
+						alert(err);
+						window.location.href = '/';
+					}else {
+						console.log('No Error');
+					}
+				});
+			});	
 		});
+
 	});
 
-	
-
-	
-	
 	//파일 업로드 함수//
 	function fileupload(firstFile){
 
@@ -165,30 +233,7 @@ ul, li{
 		let messages = document.querySelector('#messages').lastElementChild;
 		messages.scrollIntoView();
 	}
-	
-	socket.on('connect', function() {
-		let data = {studyNo :studyNo,
-					email :email,
-					profile: profile,
-					nickname: nickname};
-		console.log(data);
-		socket.emit('join', data, function(err) {
-			if(err){
-				alert(err);
-			    window.location.href = '/';
-			}else {
-			    console.log('No Error');
-			}
-		})
-	});
 
-	
-	
-	socket.on('disconnect', function() {
-		console.log('disconnected from server.');
-		
-		
-	});
 
 	socket.on('updateUsersList', function (users) {
 		
@@ -196,15 +241,24 @@ ul, li{
 		let ol = document.createElement('ol');
 		
 		users.forEach(function (user) {
+			
+			console.log(JSON.stringify(user.name));
 			let li = document.createElement('li');
 			let img = document.createElement('img');
-			console.log(user.profile);
-			img.src = 'files/'+user.profile;
-			img.width = 40;
-			img.height = 20;
+			let span1 = document.createElement('span');
+			li.id = "profile";
+			span1.id = "pname"
+			img.src = 'http://localhost:5050/resources/images/'+user.profile;
+			img.width = 45;
+			img.height = 35;
+			img.style.borderRadius = '50%';
+			span1.textContent = user.name;
+			if(nickname != user.name ){
+				span1.textContent +=" (me)";
+			}
 		    //li.innerHTML = img;
 			li.appendChild(img);
-			li.append("  "+user.name);
+			li.append(span1);
 			
 		    ol.appendChild(li);
 		});
@@ -214,6 +268,9 @@ ul, li{
 		usersList.append(ol);
 		})
 		
+		socket.on('disconnect', () => {
+
+    	});
 
 		socket.on('newMessage', function(data) {
 			data.type +=""
@@ -228,39 +285,41 @@ ul, li{
 			const formattedTime = moment(data.createdAt).format('LT');
 			if (email === data.email) {
 				const html = 
-				'<li class="message"><div class="mymessage__title"><span id="span1">'+
-				' me </span><span id="span2">'
+				'<li class="my_message"><div class="message__title"><h4>'+
+				' me </h4><span id="span">'
 				+formattedTime+
-				'</span></div><div class="mymessage__body"><p>'
+				'</span></div><div class="message__body"><div class="message__bubble">'
 				+data.text+
-				'</p></div></li>';
+				'</div></div></li>';
 
-				const div = document.createElement('div');
-				div.innerHTML = html;
+				//const li = document.createElement('li');
+				//li.innerHTML = html;
 
-				$('#messages').append(div);
+				$('#messages').append(html);
 				scrollToBottom();
 			} else {
 				const html = 
-				'<li class="message"><div class="message__title"><h4>'
+				'<li class="other_message"><div class="message__title"><h4>'
 				+data.nickname+
 				'</h4><span>'
 				+formattedTime+
-				'</span></div><div class="message__body"><p>'
+				'</span></div><div class="message__body"><div class="message__bubble">'
 				+data.text+
-				'</p></div></li>';
+				'</div></div></li>';
 
-				const div = document.createElement('div');
-				div.innerHTML = html;
+				const li = document.createElement('li');
+				li.innerHTML = html;
 
-				$('#messages').append(div);
+				$('#messages').append(li);
 				scrollToBottom();
 			}
 		
 	});
 	$('#submit-btn').on('click', function(e) {
 		e.preventDefault();
+		
 		socket.emit("createMessage", {
+		socketId: socket.id,
 		email: email,
 		nickname: nickname,
 		text: $('#messageInput').val()
@@ -270,22 +329,6 @@ ul, li{
 		});
 	});
 
-
-			//let buffer = reader.result;
-			
-			// let slice = firstFile.slice(0,4);
-			// let view = new DataView(buffer);
-			// let magic = view.getUint32(0, false);
-			
-			
-			// switch(magic){
-			// 	case 0xffd8ffe0: firstFile.verified_type = "image/jpeg"; break;
-			// 	case 0x89504E47: firstFile.verified_type = "image/png"; break;
-			// 	case 0x47474638: firstFile.verified_type = "image/gif"; break;
-			// 	case 0x25504446: firstFile.verified_type = "application/pdf"; break;
-			// 	case 0x504b0304: firstFile.verified_type = "application/zip"; break;
-			// 	case 0x66747970: firstFile.verified_type = "video/mp4"; break;
-			// }
 </script>   
 </body>
 </html>

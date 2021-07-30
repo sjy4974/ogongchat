@@ -3,8 +3,8 @@ class Users {
       this.users = [];
     }
   
-    addUser(email, name, profile, room) {
-      let user = {email, name, profile, room};
+    addUser(socketId, email, name, profile, room) {
+      let user = {socketId, email, name, profile, room};
       this.users.push(user);
       return user;
     }
@@ -17,15 +17,15 @@ class Users {
       return users;
     }
   
-    getUser(email) {
-      return this.users.filter((user) => user.email === email)[0];
+    getUser(id) {
+      return this.users.filter((user) => user.socketId === id)[0];
     }
   
-    removeUser(email) {
-      let user = this.getUser(email);
+    removeUser(id) {
+      let user = this.getUser(id);
   
       if(user){
-        this.users = this.users.filter((user) => user.email !== email);
+        this.users = this.users.filter((user) => user.socketId !== id);
       }
   
       return user;
