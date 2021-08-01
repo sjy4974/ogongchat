@@ -111,8 +111,9 @@ $(function (){
 			.then(json => {
 				console.log(json);
 				nickname = json.nickname;
-				if(json.profile){
+				if(json.userImage){
 					profile = json.userImage;
+					console.log(profile);
 				}
 			}).then( ()=> {
 
