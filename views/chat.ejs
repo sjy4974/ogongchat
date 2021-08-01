@@ -33,17 +33,13 @@ ul, li{
     right: -10%;
 
 }
-.message__bubble {
-    border-top-right-radius: 0;
-    background-image: linear-gradient(to left, #00c6ff, #0072ff);
-}
 
 .message__bubble {
     background-color: white;
     box-shadow: rgb(50 50 93 / 25%) 0px 13px 27px -5px, rgb(0 0 0 / 30%) 0px 8px 16px -8px, rgb(0 0 0 / 2%) 0px -6px 16px -6px;
     padding: 10px 20px;
     border-radius: 20px;
-    color: white;
+    color: black;
     font-weight: 600;
 }
 
@@ -144,12 +140,14 @@ $(function (){
 
 		//reader = new FileReader();
 
+		console.log(firstFile);
+
 
         var blobstream = ss.createBlobReadStream(firstFile);
         var stream = ss.createStream();
 		var type = (firstFile.name).split('.');
 		console.log("확장자: "+type[1]);
-		var buffer = [];
+		//var buffer = [];
 		
 		ss(socket).emit('upload', stream, {
 			//id: socket.id,
@@ -159,14 +157,12 @@ $(function (){
 			//type: firstFile.type,
 			//size: firstFile.size
 		});
-		//var blobstream = ss.createBlobReadStream(firstFile);
-		//ss.forceBase64 = true;
 		var uploadSize = 0;
         blobstream.on('data', function(chunk){
 
             uploadSize += chunk.length;
             console.log(Math.floor(uploadSize / firstFile.size * 100)+ '%');
-			buffer.push(chunk);
+			//buffer.push(chunk);
         });
 		stream.on('end', function(){
 			
@@ -272,9 +268,6 @@ $(function (){
 				'</span></div><div class="message__body"><div class="message__bubble">'
 				+data.text+
 				'</div></div></li>';
-
-				//const li = document.createElement('li');
-				//li.innerHTML = html;
 
 				$('#messages').append(html);
 				scrollToBottom();

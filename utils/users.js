@@ -11,9 +11,6 @@ class Users {
   
     getUserList (room) {
       let users = this.users.filter((user) => user.room === room);
-      // console.log("여기 users");
-      // console.log(users);
-      // let namesArray = users.map((user) => user.name);
       return users;
     }
   

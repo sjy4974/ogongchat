@@ -76,13 +76,6 @@ io.on('connection', (socket) => {
       var fn = path.basename(data.name);
       console.log(fn);
       stream.pipe(fs.createWriteStream("public/files/"+fn));
-
-      // io.to(data.studyNo).emit('newMessage',{
-      //   id: data.id,
-      //     from: data.email,
-      //     name: data.name,
-      //     type: data.type   
-      // });
     });
 
     socket.on("done", (data) => {

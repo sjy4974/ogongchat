@@ -1,0 +1,93 @@
+회원가입 : addUser
+비밀번호찾기 : findPassword
+비밀번호변경 : updatePassword
+나의프로필 : myProfile
+나의프로필수정 : updeteMyProfile
+회원탈퇴 : withdrawalUser
+회원복구 : restoreUser
+나의스터디 : listMyStudy
+나의게시글 : listMyBoard
+바나나조회 : listBanana
+
+정보공유 게시판 목록 검색 
+infoListBoard
+정보공유 게시판 등록
+infoAddBoard 
+정보공유 게시판 보기,삭제
+infoGetBoard
+정보공유 게시판 수정
+infoUpdateBoard
+Q&A 게시판 목록,검색
+qaListBoard
+Q&A 게시판 등록
+qaAddBoard
+Q&A게시글 보기,삭제
+qaGetBoard
+Q&A 답변 등록
+qaAnswerAddBoard
+Q&A 답변 보기,삭제
+qaAnswerGetBoard
+Q&A답변 수정 
+qaAnswerUpdateBoard
+Q&A 게시글 수정
+qaUpdateBoard
+쉼터게시글 목록,검색
+freeListBoard
+쉼터 게시글 등록
+freeAddBoard
+쉼터게시글 보기,삭제
+freeGetBoard
+쉼터게시글 수정
+freeUpdateBoard
+
+스터디룸
+스터디룸 홈 - StudyRoomMain
+스터디룸 정보조회 - getStudyRoom
+스터디룸 정보수정 - updateStudyRoom
+스터디룸 일정 등록 - addStudyRoomCalendar
+스터디룸 일정 수정 - updateStudyRoomCalendar
+파일공유게시판 목록 - listFileShareBorad
+파일공유 게시글 등록 - addFileShareBoard
+파일공유 게시글 상세조회 - getFileShareBoard
+그룹스터디 참가신청 회원목록 - listGroupStudyParticipationUser
+그룹스터디원 목록보기 - listgroupStudyMember
+
+스터디
+자율스터디 목록 = listAutonomyStudy
+자율스터디 개설 = addAutonomyStudy
+자율스터디 모집게시판 목록 = listRecruitmentBoard
+자율스터디 모집게시판 등록 = addRecruitmentBoard
+자율스터디 모집게시판 보기 = getRecruitmentBoard
+(게시글 신고 추가)
+자율스터디 모집게시판 수정 = updateRecruitmentBoard
+그룹스터디 목록 = listGroupStudy
+그룹스터디 개설 = addGroupStudy
+그룹스터디 상세보기 = getGroupStudy
+그룹스터디 참가신청 = groupStudyParticipation
+
+관리자 기능
+신고된 사용자 목록 = listReportClient
+(정지선택 화면 추가)
+신고된 게시글 목록 = listReportBoard
+(정지선택 화면 추가)
+신고된 댓글 목록 = listReportComment
+(정지선택 화면 추가)
+신고된 답변 목록 = listReportAnswer
+(정지선택 화면 추가)
+모든 회원 목록 = listTotalUser
+탈퇴 회원 목록 = listWithdrawUser
+복구 회원 목록 = listRestoreUser
+
+통합관리
+받은 쪽지 목록 = listReceiveMessage
+보낸 쪽지 목록 = listSendMessage
+쪽지 보내기 = AddSendMessage
+
+화상스터디메인 : camStudyMain
+화상스터디정보확인 : camStudyInfo
+화상스터디정보수정 : updatecamStudyInfo
+화상스터디초대하기 : inviteCamStudy
+화상스터디참여자목록 : listCamStudyMember
+
+
+com.

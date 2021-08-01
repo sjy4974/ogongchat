@@ -146,14 +146,14 @@ ul {
 .my_message .message__bubble {
     
     border-top-right-radius: 0;
-    background-image: linear-gradient(to left, #00c6ff, #0072ff);
+    background-color: #ffdc3c;
 }
 .my_message{
     align-self: flex-end;
 }
 .other_message .message__bubble {
     border-top-left-radius: 0;
-    background-image: linear-gradient(to right, #7b4397, #dc2430);
+    background-color: white;
 }
 .other_message {
     animation: incomingAnima 0.5s ease-out forwards;
