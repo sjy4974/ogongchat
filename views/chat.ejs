@@ -227,7 +227,7 @@ $(function (){
 			img.height = 35;
 			img.style.borderRadius = '50%';
 			span1.textContent = user.name;
-			if(nickname != user.name ){
+			if(nickname == user.name ){
 				span1.textContent +=" (me)";
 			}
 		    //li.innerHTML = img;
@@ -263,24 +263,23 @@ $(function (){
 			const formattedTime = moment(data.createdAt).format('LT');
 			if (email === data.email) {
 				const html = 
-				'<li class="my_message"><div class="message__title"><h4>'+
-				' me </h4><span id="span">'
-				+formattedTime+
-				'</span></div><div class="message__body"><div class="message__bubble">'
-				+data.text+
-				'</div></div></li>';
+				'<li class="my_message"><div class="message__title"><h4>'
+				+'<div><img src="http://localhost:5050/resources/images/'+data.image+'" width=25px; height= 25px; /> me </h4><span id="span">'
+				+formattedTime
+				+'</span></div><div class="message__body"><div class="message__bubble">'
+				+data.text
+				+'</div></div></li>';
 
 				$('#messages').append(html);
 				scrollToBottom();
 			} else {
 				const html = 
 				'<li class="other_message"><div class="message__title"><h4>'
-				+data.nickname+
-				'</h4><span>'
-				+formattedTime+
-				'</span></div><div class="message__body"><div class="message__bubble">'
-				+data.text+
-				'</div></div></li>';
+				+'<div><img src="http://localhost:5050/resources/images/'+data.image+'" width=25px; height= 25px; />'+ data.nickname+'</h4><span>'
+				+formattedTime
+				+'</span></div><div class="message__body"><div class="message__bubble">'
+				+data.text
+				+'</div></div></li>';
 
 				const li = document.createElement('li');
 				li.innerHTML = html;
@@ -297,6 +296,7 @@ $(function (){
 		socketId: socket.id,
 		email: email,
 		nickname: nickname,
+		image: profile,
 		text: $('#messageInput').val()
 		}, function() {
 			$('#messageInput').val('').focus();

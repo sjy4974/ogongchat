@@ -90,14 +90,19 @@ io.on('connection', (socket) => {
 
 
     socket.on('createMessage', (data, callback) => {
-      console.log("createmessage data값");
+      console.log("createmessage data 값");
       console.log(data);
       
       let user = users.getUser(socket.id);
       const msg = new Msg({studyNo:user.room, email:data.email, message:data.text});
 
       msg.save().then(()=>{
-      io.to(user.room).emit('newMessage', generateMessage(user.email, user.name, data.text));
+        io.to(user.room).emit('newMessage', {
+          email:user.email, 
+          nickname:user.name,
+          image:data.image,
+          text:data.text
+        });
       });
       callback('This is the server:');
     });
